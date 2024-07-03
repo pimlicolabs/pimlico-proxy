@@ -1,4 +1,4 @@
-FROM envoyproxy/envoy:v1.27.1
+FROM envoyproxy/envoy:v1.28.0
 
 ARG OTEL_HOST
 ARG OTEL_AUTH
