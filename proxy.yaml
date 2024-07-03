@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: envoy-container
-          image: envoyproxy/envoy:v1.27.1
+          image: envoyproxy/envoy:v1.28.0
           args:
             - --log-level
             - info
