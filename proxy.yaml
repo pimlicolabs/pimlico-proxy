@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pimlico-proxy
+  labels:
+    app.kubernetes.io/name: pimlico-proxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: pimlico-proxy
+  template:
+    metadata:
+      # annotations:
+      #   prometheus.io/scrape: "true"
+      #   prometheus.io/port: "9090"
+      #   prometheus.io/path: "/stats/prometheus"
+      labels:
+        app.kubernetes.io/name: pimlico-proxy
+    spec:
+      containers:
+        - name: envoy-container
+          image: envoyproxy/envoy:v1.27.1
+          args:
+            - --log-level
+            - info
+            - -c
+            - /etc/envoy/envoy.yaml
+          ports:
+            - name: http
+              containerPort: 8080
+            - name: admin
+              containerPort: 9090
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/envoy
+          resources:
+            requests:
+              cpu: 100m
+              memory: 50Mi
+          lifecycle:
+            preStop:
+              exec:
+                command: [ "/bin/sleep", "15" ] # for graceful shutdown
+      terminationGracePeriodSeconds: 15
+      volumes:
+        - name: config-volume
+          configMap:
+            name: envoy-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pimlico-proxy
+spec:
+  selector:
+    app.kubernetes.io/name: pimlico-proxy
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: http
+  type: ClusterIP
