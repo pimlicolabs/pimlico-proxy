@@ -37,11 +37,6 @@ static_resources:
                       port_value: 80
       name: opentelemetry_collector
       type: STRICT_DNS
-      # typed_extension_protocol_options:
-      #   envoy.extensions.upstreams.http.v3.HttpProtocolOptions:
-      #     '@type': type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions
-      #     explicit_http_config:
-      #       http2_protocol_options: {}
     - lb_policy: ROUND_ROBIN
       load_assignment:
         cluster_name: admin
@@ -93,6 +88,9 @@ static_resources:
                           upstream_cluster: '%UPSTREAM_CLUSTER%'
                           upstream_host: '%UPSTREAM_HOST%'
                           upstream_request_attempt_count: '%UPSTREAM_REQUEST_ATTEMPT_COUNT%'
+                          request_id: '%REQ(X-REQUEST-ID)%'
+                          x_forwarded_for: '%REQ(X-FORWARDED-FOR)%'
+                          user_agent: '%REQ(USER-AGENT)%'
                 http_filters:
                   - name: envoy.filters.http.router
                     typed_config:
